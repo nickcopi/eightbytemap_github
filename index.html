@@ -1,0 +1,56 @@
+<canvas id = "canvas" width="160" height="160">HTML5</canvas><br>
+<label>Scale</label><br>
+<input id="scale" value="20"><br>
+<input maxlength = "8" id="code"><input type ="button" value="Draw" onclick="draw()">
+<script>
+	var canvas = document.getElementById('canvas');
+	var ctx = canvas.getContext('2d');
+	var codes = new Array();
+	for(i=0;i<8;i++){
+		codes.push("00000000".split(""));
+	}
+	function draw(){
+		var code = document.getElementById('code').value;
+		if(code.length != 8){
+			return;
+		}
+		var scale = Number(document.getElementById('scale').value);
+		canvas.width = 8*scale;
+		canvas.height = 8*scale;
+		ctx.clearRect(0,0,canvas.width,canvas.height)
+		codes = new Array();
+		for(x in code){
+			let bin = (code.charCodeAt(x)-32).toString(2);
+			for(i = 0; i<8-bin.length;i++){
+				bin = "0" + bin;
+				i--;
+			}
+			console.log(bin.length);
+			codes.push(bin.split(""));
+		}
+		for(y = 0; y < codes.length; y++){
+			for(x = 0; x < codes[y].length; x++){
+				if(Number(codes[x][y])){
+					ctx.fillRect(x*scale,y*scale,scale,scale);
+				}
+			}
+		}
+	}
+	canvas.onclick = function(e){
+		var scale = Number(document.getElementById('scale').value);
+		let x = e.pageX - this.offsetLeft
+		let y = e.pageY - this.offsetTop
+		let index = Math.floor(x/scale);
+		let indey = Math.floor(y/scale);
+		console.log(codes[index][indey]);
+		codes[index][indey] = !ctx.getImageData(x,y,1,1).data[3]?1:0;
+		console.log(codes[index][indey]);
+		let letters = "";
+		for(i in codes){
+			letters += String.fromCharCode(parseInt(codes[i].join(""),2)+32)
+		}
+		console.log(letters);
+		document.getElementById('code').value = letters;
+		draw()
+	}
+</script>
